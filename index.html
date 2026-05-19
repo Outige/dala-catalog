@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dala Studio | Art & OEM</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="css/style.css" />
+
+</head>
+
+<body>
+
+<header>
+  <div class="nav">
+    <div class="brand">DALA STUDIO</div>
+    <nav>
+      <a class="active" onclick="showSection('dala')">Dala</a>
+      <a onclick="showSection('teddy')">Teddy</a>
+      <a onclick="showSection('oem')">OEM</a>
+      <a onclick="showSection('contact')">Contact</a>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <h1>Art-led design studio</h1>
+  <p>
+    Dala is our primary creative brand. Teddy is a sub-label focused on playful, experimental work.
+    We also provide OEM manufacturing and production services for external partners.
+  </p>
+</div>
+
+<!-- DALA -->
+<section id="dala" class="section active">
+  <h2>DALA (Primary Brand)</h2>
+  <p class="subtext">
+    High-end art objects and curated collections. Focus on form, material, and limited releases.
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Collection Alpha</h3>
+      <p>Sculptural pieces exploring geometric minimalism.</p>
+    </div>
+    <div class="card">
+      <h3>Series: Earth Tone</h3>
+      <p>Natural pigments, raw textures, handcrafted finish.</p>
+    </div>
+    <div class="card">
+      <h3>Limited Drops</h3>
+      <p>Small batch releases with serialized authentication.</p>
+    </div>
+  </div>
+</section>
+
+<!-- TEDDY -->
+<section id="teddy" class="section">
+  <h2>TEDDY (Sub Brand)</h2>
+  <p class="subtext">
+    Experimental and playful direction. More accessible, faster iteration cycles.
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h3>Soft Forms</h3>
+      <p>Rounded, friendly shapes with tactile emphasis.</p>
+    </div>
+    <div class="card">
+      <h3>Color Studies</h3>
+      <p>High saturation explorations and pop aesthetics.</p>
+    </div>
+  </div>
+</section>
+
+<!-- OEM -->
+<section id="oem" class="section">
+  <h2>OEM SERVICES</h2>
+  <p class="subtext">
+    We support external brands with design-to-production workflows.
+  </p>
+
+  <div class="oem-box">
+    <strong>Capabilities</strong>
+    <ul>
+      <li>Product design & prototyping</li>
+      <li>Material sourcing</li>
+      <li>Small to large batch production</li>
+      <li>Packaging design</li>
+      <li>Quality control & finishing</li>
+    </ul>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact" class="section">
+  <h2>CONTACT</h2>
+  <p class="subtext">Business inquiries and collaborations.</p>
+
+  <div class="contact">
+    <input type="text" placeholder="Name"/>
+    <input type="email" placeholder="Email"/>
+    <textarea rows="5" placeholder="Message"></textarea>
+    <button>Send</button>
+  </div>
+</section>
+
+<footer>
+  © Dala Studio. All rights reserved.
+</footer>
+
+<script>
+function showSection(id){
+  const sections = document.querySelectorAll('.section');
+  const links = document.querySelectorAll('nav a');
+
+  sections.forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+
+  links.forEach(l => l.classList.remove('active'));
+  event.target.classList.add('active');
+}
+</script>
+
+</body>
+</html>
