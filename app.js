@@ -50,9 +50,10 @@
     return `
       <section class="hero-section">
         <div class="hero-copy">
+          <span class="hero-kicker">Dala Artist Materials</span>
           <img class="hero-logo" src="assets/dala-logo-bw.png" alt="Dala">
-          <h1>Artist materials first. Kids creativity as a playful companion brand.</h1>
-          <p>Dala leads the catalog with paint, clay, craft, and manufacturing capabilities. Teddy sits alongside it as a simpler kids creative materials range.</p>
+          <h1>Colour, texture, and tools for working artists.</h1>
+          <p>Dala leads with paint, clay, craft, and manufacturing capability. Teddy sits alongside as a focused kids creative range.</p>
           <div class="hero-actions">
             <a class="button primary" href="?brand=dala">Explore Dala</a>
             <a class="button" href="?brand=teddy">View Teddy</a>
@@ -60,6 +61,9 @@
         </div>
         <div class="hero-image">
           <img src="assets/brushes-and-oil-paint-messy-spectrum-of-colours_w544xh544.jpg" alt="Paint brushes and colour">
+          <div class="swatch-strip" aria-hidden="true">
+            <span></span><span></span><span></span><span></span><span></span>
+          </div>
         </div>
       </section>
     `;

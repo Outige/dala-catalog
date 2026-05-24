@@ -1,13 +1,13 @@
 :root {
-  --ink: #161616;
-  --muted: #626262;
-  --paper: #fbfaf8;
+  --ink: #050505;
+  --muted: #595959;
+  --paper: #f5f3ee;
   --panel: #ffffff;
-  --line: #dedad3;
-  --red: #d71920;
-  --gold: #f1b82d;
+  --line: #d8d3c8;
+  --red: #e30613;
+  --gold: #ffd200;
   --green: #1d7f67;
-  --blue: #2d6cdf;
+  --blue: #0057ff;
   --shadow: 0 16px 45px rgba(22, 22, 22, 0.08);
 }
 
@@ -19,7 +19,7 @@ body {
   margin: 0;
   background: var(--paper);
   color: var(--ink);
-  font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 a {
@@ -33,12 +33,13 @@ img {
 
 .site-header {
   align-items: center;
-  background: rgba(251, 250, 248, 0.94);
-  border-bottom: 1px solid var(--line);
+  background: #050505;
+  border-bottom: 4px solid var(--red);
+  color: white;
   display: flex;
   gap: 24px;
   justify-content: space-between;
-  padding: 14px clamp(18px, 4vw, 54px);
+  padding: 12px clamp(18px, 4vw, 54px);
   position: sticky;
   top: 0;
   z-index: 20;
@@ -52,13 +53,15 @@ img {
 }
 
 .brand-lockup img {
-  height: 46px;
+  background: white;
+  height: 50px;
+  padding: 8px 10px;
   width: auto;
 }
 
 .brand-lockup span {
-  border-left: 1px solid var(--line);
-  color: var(--muted);
+  border-left: 1px solid rgba(255, 255, 255, 0.35);
+  color: white;
   font-size: 13px;
   font-weight: 700;
   padding-left: 14px;
@@ -75,20 +78,23 @@ img {
 .main-nav a,
 .button {
   align-items: center;
-  border: 1px solid var(--line);
-  border-radius: 6px;
+  border: 2px solid currentColor;
+  border-radius: 0;
   display: inline-flex;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 900;
+  letter-spacing: 0;
   min-height: 40px;
   padding: 0 14px;
   text-decoration: none;
+  text-transform: uppercase;
 }
 
 .main-nav a:hover,
 .button:hover {
+  background: var(--red);
   border-color: var(--red);
-  color: var(--red);
+  color: white;
 }
 
 .button.primary {
@@ -103,21 +109,44 @@ img {
 .product-detail,
 .content-section {
   margin: 0 auto;
-  max-width: 1180px;
-  padding: clamp(28px, 6vw, 72px) clamp(18px, 4vw, 54px);
+  max-width: 1360px;
+  padding: clamp(30px, 6vw, 82px) clamp(18px, 4vw, 54px);
 }
 
 .hero-section {
   align-items: center;
+  background: #050505;
+  color: white;
   display: grid;
-  gap: clamp(24px, 5vw, 64px);
+  gap: 0;
   grid-template-columns: minmax(0, 1.05fr) minmax(300px, 0.95fr);
-  min-height: calc(100vh - 76px);
+  max-width: none;
+  min-height: calc(100vh - 78px);
+  padding-bottom: clamp(22px, 4vw, 44px);
+  padding-top: clamp(22px, 4vw, 44px);
+}
+
+.hero-copy {
+  padding: clamp(24px, 5vw, 76px);
+}
+
+.hero-kicker {
+  background: var(--red);
+  color: white;
+  display: inline-block;
+  font-size: clamp(18px, 2.4vw, 34px);
+  font-weight: 950;
+  line-height: 1;
+  margin-bottom: 24px;
+  padding: 10px 14px;
+  text-transform: uppercase;
 }
 
 .hero-logo {
-  height: 92px;
-  margin-bottom: 22px;
+  background: white;
+  height: clamp(74px, 9vw, 124px);
+  margin-bottom: 28px;
+  padding: 12px 16px;
   width: auto;
 }
 
@@ -129,27 +158,38 @@ p {
 }
 
 h1 {
-  font-size: clamp(42px, 7vw, 86px);
+  font-size: clamp(48px, 8.5vw, 122px);
+  font-weight: 950;
   letter-spacing: 0;
-  line-height: 0.94;
+  line-height: 0.86;
   margin-bottom: 22px;
+  text-transform: uppercase;
 }
 
 h2 {
-  font-size: clamp(28px, 4vw, 46px);
-  line-height: 1;
+  font-size: clamp(34px, 5.5vw, 76px);
+  font-weight: 950;
+  line-height: 0.9;
   margin-bottom: 16px;
+  text-transform: uppercase;
 }
 
 h3 {
   font-size: 21px;
+  font-weight: 950;
   margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 p {
   color: var(--muted);
   font-size: 17px;
   line-height: 1.6;
+}
+
+.hero-copy p,
+.brand-header p {
+  color: rgba(255, 255, 255, 0.78);
 }
 
 .hero-copy p {
@@ -164,10 +204,12 @@ p {
 }
 
 .hero-image {
-  aspect-ratio: 1 / 1;
-  background: #ece7dd;
-  border: 1px solid var(--line);
+  align-self: stretch;
+  aspect-ratio: auto;
+  background: #222;
+  border: 0;
   overflow: hidden;
+  position: relative;
 }
 
 .hero-image img,
@@ -179,11 +221,27 @@ p {
   width: 100%;
 }
 
+.swatch-strip {
+  bottom: 0;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  height: 22px;
+  left: 0;
+  position: absolute;
+  right: 0;
+}
+
+.swatch-strip span:nth-child(1) { background: var(--red); }
+.swatch-strip span:nth-child(2) { background: var(--gold); }
+.swatch-strip span:nth-child(3) { background: var(--blue); }
+.swatch-strip span:nth-child(4) { background: var(--green); }
+.swatch-strip span:nth-child(5) { background: white; }
+
 .eyebrow {
   color: var(--red);
   display: block;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 950;
   letter-spacing: 0;
   margin-bottom: 10px;
   text-transform: uppercase;
@@ -202,24 +260,24 @@ p {
 }
 
 .category-grid {
-  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
 }
 
 .category-card {
   background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
-  min-height: 310px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  min-height: 330px;
   overflow: hidden;
   padding-bottom: 18px;
   text-decoration: none;
-  transition: border-color 160ms ease, transform 160ms ease;
+  transition: box-shadow 160ms ease, transform 160ms ease;
 }
 
 .category-card:hover,
 .product-card:hover,
 .stockist-card:hover {
-  border-color: var(--red);
+  box-shadow: 8px 8px 0 var(--red);
   transform: translateY(-2px);
 }
 
@@ -237,8 +295,10 @@ p {
 
 .category-card strong {
   display: block;
-  font-size: 20px;
+  font-size: 24px;
+  font-weight: 950;
   margin-bottom: 8px;
+  text-transform: uppercase;
 }
 
 .category-card small {
@@ -257,16 +317,17 @@ p {
 
 .product-card {
   background: var(--panel);
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
   overflow: hidden;
-  transition: border-color 160ms ease, transform 160ms ease;
+  transition: box-shadow 160ms ease, transform 160ms ease;
 }
 
 .product-media {
   align-items: center;
   aspect-ratio: 5 / 4;
-  background: #f0ece5;
+  background: #f7f4ed;
+  border-bottom: 2px solid var(--ink);
   display: flex;
   justify-content: center;
 }
@@ -295,31 +356,35 @@ p {
 }
 
 .tag-row span {
-  background: #f1eee8;
-  border: 1px solid var(--line);
-  border-radius: 999px;
-  color: #45423d;
+  background: white;
+  border: 2px solid var(--ink);
+  border-radius: 0;
+  color: var(--ink);
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 950;
   padding: 7px 10px;
+  text-transform: uppercase;
 }
 
 .brand-header {
   align-items: center;
-  border-bottom: 1px solid var(--line);
+  background: #050505;
+  border-bottom: 18px solid var(--brand-color);
+  color: white;
   display: grid;
   gap: 30px;
   grid-template-columns: minmax(0, 1fr) 210px;
+  max-width: none;
 }
 
 .brand-header h1 {
-  color: var(--brand-color);
+  color: white;
 }
 
 .brand-header img {
   background: white;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 0;
+  border-radius: 0;
   padding: 24px;
 }
 
@@ -332,8 +397,8 @@ p {
 
 .listing-header img {
   aspect-ratio: 4 / 3;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
 }
 
 .product-detail {
@@ -346,8 +411,8 @@ p {
   align-items: center;
   aspect-ratio: 1 / 1;
   background: white;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
   display: flex;
   justify-content: center;
   padding: clamp(24px, 6vw, 70px);
@@ -369,16 +434,17 @@ p {
 }
 
 .detail-block h2 {
-  font-size: 20px;
+  font-size: 24px;
 }
 
 .back-link {
   color: var(--muted);
   display: inline-block;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 950;
   margin-bottom: 18px;
   text-decoration: none;
+  text-transform: uppercase;
 }
 
 .stockist-grid {
@@ -388,14 +454,14 @@ p {
 .stockist-card {
   align-items: center;
   background: white;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
   display: grid;
   gap: 14px;
   min-height: 150px;
   padding: 20px;
   text-align: center;
-  transition: border-color 160ms ease, transform 160ms ease;
+  transition: box-shadow 160ms ease, transform 160ms ease;
 }
 
 .stockist-card img {
@@ -406,8 +472,8 @@ p {
 
 .empty-state {
   background: white;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
   padding: 34px;
 }
 
@@ -430,6 +496,10 @@ p {
 
   .hero-section {
     min-height: auto;
+  }
+
+  .hero-image {
+    min-height: 360px;
   }
 
   .brand-header img {

@@ -2,22 +2,24 @@
 .cms-toolbar button,
 .cms-form button {
   background: white;
-  border: 1px solid var(--line);
-  border-radius: 6px;
+  border: 2px solid currentColor;
+  border-radius: 0;
   color: var(--ink);
   cursor: pointer;
   font: inherit;
   font-size: 14px;
-  font-weight: 800;
+  font-weight: 950;
   min-height: 40px;
   padding: 0 14px;
+  text-transform: uppercase;
 }
 
 .main-nav button:hover,
 .cms-toolbar button:hover,
 .cms-form button:hover {
+  background: var(--red);
   border-color: var(--red);
-  color: var(--red);
+  color: white;
 }
 
 .cms-shell {
@@ -36,13 +38,13 @@
 
 .cms-panel {
   background: white;
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
   margin-top: 28px;
 }
 
 .cms-toolbar {
-  border-bottom: 1px solid var(--line);
+  border-bottom: 2px solid var(--ink);
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
@@ -62,8 +64,8 @@
 }
 
 .editor-card {
-  border: 1px solid var(--line);
-  border-radius: 8px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
   display: grid;
   gap: 14px;
   padding: 16px;
@@ -83,7 +85,7 @@ label {
   color: var(--muted);
   display: grid;
   font-size: 12px;
-  font-weight: 800;
+  font-weight: 950;
   gap: 7px;
   text-transform: uppercase;
 }
@@ -91,8 +93,8 @@ label {
 input,
 select,
 textarea {
-  border: 1px solid var(--line);
-  border-radius: 6px;
+  border: 2px solid var(--ink);
+  border-radius: 0;
   color: var(--ink);
   font: inherit;
   font-size: 15px;
