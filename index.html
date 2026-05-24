@@ -1,148 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Dala Studio | Art & OEM</title>
-
-<!-- CSS -->
-<link rel="stylesheet" href="css/style.css" />
-
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dala Catalog</title>
+  <meta name="description" content="Dala and Teddy artist materials catalog.">
+  <link rel="stylesheet" href="styles.css">
+  <script src="catalog-data.js" defer></script>
+  <script src="app.js" defer></script>
 </head>
-
 <body>
+  <header class="site-header">
+    <a class="brand-lockup" href="./" aria-label="Dala catalog home">
+      <img src="assets/dala-logo-bw.png" alt="Dala">
+      <span>Materials Catalog</span>
+    </a>
 
-<header>
-  <div class="nav">
-    <div class="logo">
-      <img src="assets/dala-logo bw.png" alt="Dala Logo"/>
-    </div>
-
-    <nav>
-      <a class="active" onclick="show('dala')">Dala</a>
-      <a onclick="show('teddy')">Teddy</a>
-      <a onclick="show('oem')">OEM</a>
-      <a onclick="show('contact')">Contact</a>
+    <nav class="main-nav" aria-label="Primary navigation">
+      <a href="./">Catalog</a>
+      <a href="?brand=dala">Dala</a>
+      <a href="?brand=teddy">Teddy</a>
+      <a href="?section=stockists">Stockists</a>
+      <a href="cms.html">CMS</a>
     </nav>
-  </div>
-</header>
+  </header>
 
-<div class="hero">
-  <h1>Art & Product Catalog</h1>
-  <p>
-    Dala is our primary brand focused on collectible art objects. Teddy is a sub-brand for experimental and accessible design.
-    We also manufacture OEM products for external brands.
-  </p>
-</div>
-
-<!-- DALA -->
-<section id="dala" class="section active">
-  <h2>DALA COLLECTIONS</h2>
-  <p class="subtext">Primary brand — high-end art objects and limited production runs.</p>
-
-  <div class="grid">
-
-    <div class="card">
-      <img src="assets/dala-1.jpg"/>
-      <div class="card-content">
-        <h3>Stone Series</h3>
-        <p>Raw material sculptural objects with natural finish.</p>
-      </div>
-    </div>
-
-    <div class="card">
-      <img src="assets/dala-2.jpg"/>
-      <div class="card-content">
-        <h3>Monolith Set</h3>
-        <p>Minimal architectural forms with matte textures.</p>
-      </div>
-    </div>
-
-    <div class="card">
-      <img src="assets/dala-3.jpg"/>
-      <div class="card-content">
-        <h3>Gold Line</h3>
-        <p>Premium accented pieces with metallic detailing.</p>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- TEDDY -->
-<section id="teddy" class="section">
-  <h2>TEDDY COLLECTIONS</h2>
-  <p class="subtext">Sub-brand — playful, experimental, fast iteration designs.</p>
-
-  <div class="grid">
-
-    <div class="card">
-      <img src="assets/teddy-1.jpg"/>
-      <div class="card-content">
-        <h3>Soft Cube</h3>
-        <p>Rounded geometric playful object series.</p>
-      </div>
-    </div>
-
-    <div class="card">
-      <img src="assets/teddy-2.jpg"/>
-      <div class="card-content">
-        <h3>Color Pop Set</h3>
-        <p>High saturation design experiments.</p>
-      </div>
-    </div>
-
-  </div>
-</section>
-
-<!-- OEM -->
-<section id="oem" class="section">
-  <h2>OEM SERVICES</h2>
-  <p class="subtext">Manufacturing and production services for external brands.</p>
-
-  <div class="oem">
-    <p>We provide end-to-end OEM support:</p>
-    <br/>
-    <ul style="color:#9aa0a6; font-size:14px; padding-left:18px;">
-      <li>Product design & prototyping</li>
-      <li>Material sourcing</li>
-      <li>Batch production (small & large scale)</li>
-      <li>Packaging development</li>
-      <li>Quality control</li>
-    </ul>
-  </div>
-</section>
-
-<!-- CONTACT (PROFILE ONLY) -->
-<section id="contact" class="section">
-  <h2>CONTACT</h2>
-  <p class="subtext">Direct contact information</p>
-
-  <div class="profile">
-    <img src="assets/profile.jpg" alt="Profile Photo"/>
-
-    <div>
-      <h3>Your Name & Surname</h3>
-      <p>Role: Founder / Creative Director</p>
-      <p>Email: tieg@dala.co.za</p>
-      <p>Phone: +27 XX XXX XXXX</p>
-    </div>
-  </div>
-</section>
-
-<footer>
-  © Dala Studio — All rights reserved
-</footer>
-
-<script>
-function show(id){
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-
-  document.querySelectorAll('nav a').forEach(a => a.classList.remove('active'));
-  event.target.classList.add('active');
-}
-</script>
-
+  <main id="app" tabindex="-1"></main>
 </body>
 </html>

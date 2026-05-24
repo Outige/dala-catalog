@@ -1,0 +1,124 @@
+.main-nav button,
+.cms-toolbar button,
+.cms-form button {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  cursor: pointer;
+  font: inherit;
+  font-size: 14px;
+  font-weight: 800;
+  min-height: 40px;
+  padding: 0 14px;
+}
+
+.main-nav button:hover,
+.cms-toolbar button:hover,
+.cms-form button:hover {
+  border-color: var(--red);
+  color: var(--red);
+}
+
+.cms-shell {
+  margin: 0 auto;
+  max-width: 1180px;
+  padding: clamp(28px, 6vw, 72px) clamp(18px, 4vw, 54px);
+}
+
+.cms-intro {
+  max-width: 760px;
+}
+
+.cms-intro h1 {
+  font-size: clamp(42px, 6vw, 72px);
+}
+
+.cms-panel {
+  background: white;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  margin-top: 28px;
+}
+
+.cms-toolbar {
+  border-bottom: 1px solid var(--line);
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding: 14px;
+}
+
+.cms-toolbar .active {
+  background: var(--red);
+  border-color: var(--red);
+  color: white;
+}
+
+.cms-form {
+  display: grid;
+  gap: 18px;
+  padding: 18px;
+}
+
+.editor-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+}
+
+.field-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.field-grid .wide {
+  grid-column: 1 / -1;
+}
+
+label {
+  color: var(--muted);
+  display: grid;
+  font-size: 12px;
+  font-weight: 800;
+  gap: 7px;
+  text-transform: uppercase;
+}
+
+input,
+select,
+textarea {
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--ink);
+  font: inherit;
+  font-size: 15px;
+  min-height: 42px;
+  padding: 10px;
+  width: 100%;
+}
+
+textarea {
+  min-height: 92px;
+  resize: vertical;
+}
+
+.card-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+}
+
+.add-row {
+  display: flex;
+  justify-content: flex-start;
+}
+
+@media (max-width: 720px) {
+  .field-grid {
+    grid-template-columns: 1fr;
+  }
+}

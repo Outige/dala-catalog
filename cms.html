@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dala Catalog CMS</title>
+  <link rel="stylesheet" href="styles.css">
+  <link rel="stylesheet" href="cms.css">
+  <script src="catalog-data.js" defer></script>
+  <script src="cms.js" defer></script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand-lockup" href="./">
+      <img src="assets/dala-logo-bw.png" alt="Dala">
+      <span>Catalog CMS</span>
+    </a>
+    <nav class="main-nav" aria-label="CMS navigation">
+      <a href="./">View Site</a>
+      <button id="export-data" type="button">Export Data</button>
+      <button id="reset-data" type="button">Reset Draft</button>
+    </nav>
+  </header>
+
+  <main class="cms-shell">
+    <section class="cms-intro">
+      <span class="eyebrow">Static CMS</span>
+      <h1>Catalog editor</h1>
+      <p>Edit the catalog in your browser, preview it on the site, then export the data and replace the contents of <strong>catalog-data.js</strong> before publishing.</p>
+    </section>
+
+    <section class="cms-panel">
+      <div class="cms-toolbar">
+        <button class="tab-button active" data-tab="products" type="button">Products</button>
+        <button class="tab-button" data-tab="categories" type="button">Categories</button>
+        <button class="tab-button" data-tab="brands" type="button">Brands</button>
+      </div>
+
+      <form id="cms-form" class="cms-form"></form>
+    </section>
+  </main>
+</body>
+</html>
