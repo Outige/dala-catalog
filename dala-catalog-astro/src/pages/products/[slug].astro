@@ -1,0 +1,52 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+
+export async function getStaticPaths() {
+  const products = await getCollection("products");
+
+  return products.map((product) => ({
+    params: { slug: product.id },
+    props: { product },
+  }));
+}
+
+const { product } = Astro.props;
+
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const path = (value) => `${base}${value.replace(/^\//, "")}`;
+---
+
+<BaseLayout title={product.data.title} description={product.data.summary}>
+  <section class="product-detail">
+    <img src={path(product.data.image)} alt={product.data.title} />
+
+    <div>
+      <a class="back-link" href={path("products/")}>Back to products</a>
+      <p class="eyebrow">{product.data.brand}</p>
+      <h1>{product.data.title}</h1>
+      <p class="lead">{product.data.summary}</p>
+      {product.data.description && <p>{product.data.description}</p>}
+
+      {product.data.packSizes.length > 0 && (
+        <div class="detail-block">
+          <h2>Pack Sizes</h2>
+          <ul>
+            {product.data.packSizes.map((size) => <li>{size}</li>)}
+          </ul>
+        </div>
+      )}
+
+      {product.data.tags.length > 0 && (
+        <div class="detail-block">
+          <h2>Tags</h2>
+          <ul>
+            {product.data.tags.map((tag) => <li>{tag}</li>)}
+          </ul>
+        </div>
+      )}
+    </div>
+  </section>
+</BaseLayout>

@@ -1,0 +1,27 @@
+---
+import { getCollection } from "astro:content";
+
+const products = await getCollection("products");
+const collections = await getCollection("collections");
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Catalog Checkpoint</title>
+  </head>
+  <body>
+    <h1>Catalog Checkpoint</h1>
+
+    <h2>Products</h2>
+    <ul>
+      {products.map((product) => <li>{product.data.title}</li>)}
+    </ul>
+
+    <h2>Collections</h2>
+    <ul>
+      {collections.map((collection) => <li>{collection.data.title}</li>)}
+    </ul>
+  </body>
+</html>

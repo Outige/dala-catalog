@@ -1,0 +1,17 @@
+---
+const { product } = Astro.props;
+
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const path = (value) => `${base}${value.replace(/^\//, "")}`;
+---
+
+<article class="product-card">
+  <a href={path(`products/${product.id}/`)}>
+    <img src={path(product.data.image)} alt={product.data.title} />
+    <span>{product.data.brand}</span>
+    <h2>{product.data.title}</h2>
+    <p>{product.data.summary}</p>
+  </a>
+</article>

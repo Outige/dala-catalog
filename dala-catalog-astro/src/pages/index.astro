@@ -1,0 +1,53 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import ProductCard from "../components/ProductCard.astro";
+import CollectionCard from "../components/CollectionCard.astro";
+
+const products = await getCollection("products");
+const collections = await getCollection("collections");
+const featuredProducts = products.slice(0, 4);
+
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const path = (value) => `${base}${value.replace(/^\//, "")}`;
+---
+
+<BaseLayout
+  title="Dala Catalog"
+  description="Dala artist materials catalog."
+>
+  <section class="hero">
+    <div>
+      <p class="eyebrow">Dala Artist Materials</p>
+      <h1>Colour, texture, and tools for working artists.</h1>
+      <p>
+        A static catalog for products, collections, and future trade-friendly
+        product information.
+      </p>
+      <a class="button" href={path("products/")}>View Products</a>
+    </div>
+    <img src={path("assets/collections/paint.jpg")} alt="" />
+  </section>
+
+  <section class="section">
+    <div class="section-heading">
+      <h2>Collections</h2>
+      <a href={path("collections/")}>View all</a>
+    </div>
+    <div class="collection-grid">
+      {collections.map((collection) => <CollectionCard collection={collection} />)}
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="section-heading">
+      <h2>Featured Products</h2>
+      <a href={path("products/")}>View all</a>
+    </div>
+    <div class="product-grid">
+      {featuredProducts.map((product) => <ProductCard product={product} />)}
+    </div>
+  </section>
+</BaseLayout>

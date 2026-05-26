@@ -1,0 +1,45 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import ProductCard from "../../components/ProductCard.astro";
+
+export async function getStaticPaths() {
+  const collections = await getCollection("collections");
+  const products = await getCollection("products");
+
+  return collections.map((collection) => {
+    const collectionProducts = collection.data.products
+      .map((id) => products.find((product) => product.id === id))
+      .filter(Boolean);
+
+    return {
+      params: { slug: collection.id },
+      props: { collection, products: collectionProducts },
+    };
+  });
+}
+
+const { collection, products } = Astro.props;
+
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const path = (value) => `${base}${value.replace(/^\//, "")}`;
+---
+
+<BaseLayout title={collection.data.title} description={collection.data.summary}>
+  <section class="collection-hero">
+    {collection.data.image && <img src={path(collection.data.image)} alt="" />}
+    <div>
+      <p class="eyebrow">Collection</p>
+      <h1>{collection.data.title}</h1>
+      <p>{collection.data.summary}</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="product-grid">
+      {products.map((product) => <ProductCard product={product} />)}
+    </div>
+  </section>
+</BaseLayout>

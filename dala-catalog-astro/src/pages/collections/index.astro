@@ -1,0 +1,16 @@
+---
+import { getCollection } from "astro:content";
+import BaseLayout from "../../layouts/BaseLayout.astro";
+import CollectionCard from "../../components/CollectionCard.astro";
+
+const collections = await getCollection("collections");
+---
+
+<BaseLayout title="Collections" description="Browse Dala product collections.">
+  <section class="section">
+    <h1>Collections</h1>
+    <div class="collection-grid">
+      {collections.map((collection) => <CollectionCard collection={collection} />)}
+    </div>
+  </section>
+</BaseLayout>
