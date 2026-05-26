@@ -1,112 +1,198 @@
-# Building A Basic Static Catalog Website With Astro
+# Dala Astro Catalog Tutorial
 
-This tutorial builds the first useful version of a static product catalog:
+This tutorial reproduces the current working state of this repository.
 
-- Product listing pages.
-- Individual product pages.
-- Collection listing pages.
-- Individual collection pages.
-- Content stored as Markdown files.
-- Images served from the public assets folder.
-- A clean structure that can later support a CMS, search, filters, brands, and richer landing pages.
+The goal is a basic static catalog site built with Astro:
 
-This version intentionally does not include CMS setup or smart search. Those can be added later without changing the basic content model.
+- Product content in Markdown.
+- Collection content in Markdown.
+- Product listing and product detail pages.
+- Collection listing and collection detail pages.
+- A small diagnostic checkpoint page.
+- Static images in `public/assets`.
+- GitHub Pages deployment with GitHub Actions.
 
-Recommended stack:
-
-- Astro for the static site.
-- Astro Content Collections for typed product and collection content.
-- Markdown frontmatter as the catalog database.
-- Public assets for local images.
-
-Useful official docs:
-
-- Astro content collections: https://docs.astro.build/en/guides/content-collections/
-- Astro pages and routing: https://docs.astro.build/en/basics/astro-pages/
-- Astro dynamic routes: https://docs.astro.build/en/guides/routing/
+This does not include CMS or smart search yet. The project is deliberately shaped so those can be added later.
 
 ---
 
-## 1. Create The Astro Project
+## 1. Project Shape
 
-From the folder where you keep your development projects, run:
+The repository root is:
+
+```text
+dala-catalog/
+```
+
+The Astro app lives inside:
+
+```text
+dala-catalog/dala-catalog-astro/
+```
+
+The GitHub Actions workflow lives at the repository root:
+
+```text
+dala-catalog/.github/workflows/deploy.yml
+```
+
+Current important structure:
+
+```text
+dala-catalog/
+  .github/
+    workflows/
+      deploy.yml
+  dala-catalog-astro/
+    astro.config.mjs
+    package.json
+    public/
+      styles.css
+      assets/
+        products/
+          acrylic-paint.jpg
+          air-drying-clay.jpg
+        collections/
+          paint.jpg
+          clay-and-modelling.jpg
+    src/
+      content.config.ts
+      components/
+        CollectionCard.astro
+        ProductCard.astro
+      layouts/
+        BaseLayout.astro
+      content/
+        products/
+          acrylic-paint.md
+          air-drying-clay.md
+        collections/
+          paint.md
+          clay-and-modelling.md
+      pages/
+        index.astro
+        catalog-checkpoint.astro
+        products/
+          index.astro
+          [slug].astro
+        collections/
+          index.astro
+          [slug].astro
+```
+
+Note: `src/content.config.ts` is the Astro 6 content config file. Do not use `src/content/config.ts` for this project.
+
+---
+
+## 2. Core Commands
+
+Run commands from the Astro app folder:
 
 ```bash
-npm create astro@latest dala-catalog-astro
 cd dala-catalog-astro
+```
+
+Install dependencies:
+
+```bash
 npm install
 ```
 
-Choose the minimal starter when Astro asks.
-
-Start the local dev server:
+Run the development server:
 
 ```bash
 npm run dev
 ```
 
-Astro will print a local preview URL, usually:
+Because this project has `base: "/dala-catalog"` configured for GitHub Pages, the local homepage is:
 
 ```text
-http://localhost:4321/
+http://localhost:4321/dala-catalog/
+```
+
+Useful local routes:
+
+```text
+http://localhost:4321/dala-catalog/
+http://localhost:4321/dala-catalog/catalog-checkpoint/
+http://localhost:4321/dala-catalog/products/
+http://localhost:4321/dala-catalog/products/acrylic-paint/
+http://localhost:4321/dala-catalog/collections/
+http://localhost:4321/dala-catalog/collections/paint/
+```
+
+Build the static site:
+
+```bash
+npm run build
+```
+
+The generated static site is written to:
+
+```text
+dala-catalog-astro/dist/
+```
+
+Preview the built static site:
+
+```bash
+npm run preview
+```
+
+The project requires Node `>=22.12.0`, as defined in `package.json`.
+
+---
+
+## 3. Astro Config
+
+File:
+
+```text
+dala-catalog-astro/astro.config.mjs
+```
+
+Current content:
+
+```js
+// @ts-check
+import { defineConfig } from "astro/config";
+
+export default defineConfig({
+  site: "https://outige.github.io",
+  base: "/dala-catalog",
+});
+```
+
+Why this matters:
+
+- `site` tells Astro the production domain.
+- `base` tells Astro the site is served from a GitHub Pages project path.
+
+With this config, the deployed site is expected at:
+
+```text
+https://outige.github.io/dala-catalog/
+```
+
+If the GitHub repository name changes, update `base`.
+
+For example, if the repository is `artist-materials`, use:
+
+```js
+base: "/artist-materials",
 ```
 
 ---
 
-## 2. Create The Folder Structure
+## 4. Content Collections
 
-Create these folders:
-
-```text
-src/
-  components/
-  content.config.ts
-  content/
-    products/
-    collections/
-  layouts/
-  pages/
-    products/
-    collections/
-public/
-  assets/
-    products/
-    collections/
-```
-
-Use `src/content` for structured catalog data.
-
-Use `public/assets` for images that should be available directly in the built static site.
-
-For example:
+File:
 
 ```text
-public/assets/products/acrylic-paint.jpg
-public/assets/collections/paint.jpg
+dala-catalog-astro/src/content.config.ts
 ```
 
-Those files will be available at:
-
-```text
-/assets/products/acrylic-paint.jpg
-/assets/collections/paint.jpg
-```
-
-Keep `src/pages/`. That folder is Astro's routing folder. Files inside it become website pages.
-
-Keep `src/content/`. That folder stores catalog content. Files inside it do not automatically become pages; your page routes will read from this content later.
-
----
-
-## 3. Define The Content Schemas
-
-Create:
-
-```text
-src/content.config.ts
-```
-
-Add:
+Current content:
 
 ```ts
 import { defineCollection } from "astro:content";
@@ -147,45 +233,40 @@ export const collections = {
 };
 ```
 
-This gives you a basic typed catalog.
+The project has two content collections:
 
-The `products` field inside a collection stores product IDs. For Markdown files loaded from `src/content/products`, the ID is the filename without `.md`. That is the important future-friendly choice. It means collections are manually curated instead of being guessed from tags.
+- `products`
+- `collections`
 
-Later, a CMS can write these same Markdown files. Later, search can index these same fields.
-
-Checkpoint:
-
-Run the dev server:
-
-```bash
-npm run dev
-```
-
-At this point the visible website may still look like the Astro starter. That is expected. You have created the catalog data model, but you have not created pages that display catalog data yet.
-
-If Astro reports an error about a legacy content config file, check that the file is exactly here:
-
-```text
-src/content.config.ts
-```
-
-and not here:
-
-```text
-src/content/config.ts
-```
-
----
-
-## 4. Add Example Products
-
-Create:
+Product IDs come from filenames. For example:
 
 ```text
 src/content/products/acrylic-paint.md
 ```
 
-Add:
+has this product ID:
+
+```text
+acrylic-paint
+```
+
+Collections reference products by those IDs.
+
+---
+
+## 5. Product Content
+
+Product files live in:
+
+```text
+dala-catalog-astro/src/content/products/
+```
+
+Example:
+
+```text
+src/content/products/acrylic-paint.md
+```
 
 ```md
 ---
@@ -205,13 +286,11 @@ tags:
 ---
 ```
 
-Create:
+Example:
 
 ```text
 src/content/products/air-drying-clay.md
 ```
-
-Add:
 
 ```md
 ---
@@ -230,25 +309,34 @@ tags:
 ---
 ```
 
-Copy matching image files into:
+Product images live in:
 
 ```text
 public/assets/products/
 ```
 
-If you do not have final product photography yet, use temporary placeholder images with the final filenames. The content paths can stay stable while the images improve.
+Current product images:
+
+```text
+public/assets/products/acrylic-paint.jpg
+public/assets/products/air-drying-clay.jpg
+```
 
 ---
 
-## 5. Add Example Collections
+## 6. Collection Content
 
-Create:
+Collection files live in:
+
+```text
+dala-catalog-astro/src/content/collections/
+```
+
+Example:
 
 ```text
 src/content/collections/paint.md
 ```
-
-Add:
 
 ```md
 ---
@@ -260,13 +348,11 @@ products:
 ---
 ```
 
-Create:
+Example:
 
 ```text
 src/content/collections/clay-and-modelling.md
 ```
-
-Add:
 
 ```md
 ---
@@ -278,765 +364,226 @@ products:
 ---
 ```
 
-The values under `products` are product IDs.
-
-For example:
+Collection images live in:
 
 ```text
-src/content/products/acrylic-paint.md
+public/assets/collections/
 ```
 
-has this ID:
+Current collection images:
 
 ```text
-acrylic-paint
+public/assets/collections/paint.jpg
+public/assets/collections/clay-and-modelling.jpg
 ```
 
-Checkpoint:
+The `products` list controls which products appear in the collection and in what order.
 
-Create this temporary page:
+---
 
-```text
-src/pages/catalog-checkpoint.astro
-```
+## 7. Base URL Helper
 
-Add:
+Because this site deploys to GitHub Pages at `/dala-catalog/`, links and image paths must include Astro's base URL.
+
+This helper pattern appears in the layout, cards, and detail pages:
 
 ```astro
 ---
-import { getCollection } from "astro:content";
-
-const products = await getCollection("products");
-const collections = await getCollection("collections");
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const path = (value) => `${base}${value.replace(/^\//, "")}`;
 ---
-
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>Catalog Checkpoint</title>
-  </head>
-  <body>
-    <h1>Catalog Checkpoint</h1>
-
-    <h2>Products</h2>
-    <ul>
-      {products.map((product) => <li>{product.data.title}</li>)}
-    </ul>
-
-    <h2>Collections</h2>
-    <ul>
-      {collections.map((collection) => <li>{collection.data.title}</li>)}
-    </ul>
-  </body>
-</html>
 ```
 
-Start or restart the dev server:
+Use it like this:
 
-```bash
-npm run dev
+```astro
+<a href={path("products/")}>Products</a>
+<img src={path(product.data.image)} alt={product.data.title} />
+<link rel="stylesheet" href={path("styles.css")} />
 ```
 
-Open:
+This avoids broken URLs like:
 
 ```text
-http://localhost:4321/catalog-checkpoint/
+/products/
+/assets/products/acrylic-paint.jpg
+/styles.css
 ```
 
-You should see:
-
-- Acrylic Paint
-- Air-Drying Clay
-- Paint
-- Clay And Modelling
-
-This page is only a checkpoint. You can delete `src/pages/catalog-checkpoint.astro` after the real catalog pages are working.
+Those root-relative paths work locally on a root site, but break on GitHub Pages project sites.
 
 ---
 
-## 6. Create A Base Layout
+## 8. Base Layout
 
-Create:
+File:
 
 ```text
 src/layouts/BaseLayout.astro
 ```
 
-Add:
+Purpose:
+
+- Provides shared HTML structure.
+- Loads `styles.css`.
+- Renders the main navigation.
+- Makes navigation links GitHub Pages base-aware.
+
+Routes use it like this:
 
 ```astro
----
-const {
-  title = "Dala Catalog",
-  description = "Dala artist materials catalog.",
-} = Astro.props;
----
-
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width" />
-    <title>{title}</title>
-    <meta name="description" content={description} />
-    <link rel="stylesheet" href="/styles.css" />
-  </head>
-  <body>
-    <header class="site-header">
-      <a class="site-logo" href="/">Dala Catalog</a>
-      <nav aria-label="Main navigation">
-        <a href="/products/">Products</a>
-        <a href="/collections/">Collections</a>
-      </nav>
-    </header>
-    <main>
-      <slot />
-    </main>
-  </body>
-</html>
+<BaseLayout title="Products" description="Browse Dala catalog products.">
+  <section class="section">
+    <h1>Products</h1>
+  </section>
+</BaseLayout>
 ```
 
-Using a layout now keeps later pages simple. If you add CMS pages, search, brand pages, or navigation changes later, this layout is where most shared structure will live.
-
 ---
 
-## 7. Create Reusable Catalog Components
+## 9. Reusable Cards
 
-Create:
+Product cards live in:
 
 ```text
 src/components/ProductCard.astro
 ```
 
-Add:
+They link to:
 
-```astro
----
-const { product } = Astro.props;
----
-
-<article class="product-card">
-  <a href={`/products/${product.id}/`}>
-    <img src={product.data.image} alt={product.data.title} />
-    <span>{product.data.brand}</span>
-    <h2>{product.data.title}</h2>
-    <p>{product.data.summary}</p>
-  </a>
-</article>
+```text
+/dala-catalog/products/product-id/
 ```
 
-Create:
+Collection cards live in:
 
 ```text
 src/components/CollectionCard.astro
 ```
 
-Add:
+They link to:
 
-```astro
----
-const { collection } = Astro.props;
----
-
-<article class="collection-card">
-  <a href={`/collections/${collection.id}/`}>
-    {collection.data.image && <img src={collection.data.image} alt="" />}
-    <h2>{collection.data.title}</h2>
-    <p>{collection.data.summary}</p>
-  </a>
-</article>
+```text
+/dala-catalog/collections/collection-id/
 ```
 
-These components are intentionally small. That makes them easy to reuse later in search results, CMS-managed page blocks, featured product sections, or brand pages.
+Both card components use `entry.id`, not `entry.slug`.
+
+That matters for Astro 6 content collections.
 
 ---
 
-## 8. Create The Home Page
+## 10. Pages And Routes
 
-Replace:
+Homepage:
 
 ```text
 src/pages/index.astro
 ```
 
-with:
-
-```astro
----
-import { getCollection } from "astro:content";
-import BaseLayout from "../layouts/BaseLayout.astro";
-import ProductCard from "../components/ProductCard.astro";
-import CollectionCard from "../components/CollectionCard.astro";
-
-const products = await getCollection("products");
-const collections = await getCollection("collections");
-const featuredProducts = products.slice(0, 4);
----
-
-<BaseLayout
-  title="Dala Catalog"
-  description="Dala artist materials catalog."
->
-  <section class="hero">
-    <div>
-      <p class="eyebrow">Dala Artist Materials</p>
-      <h1>Colour, texture, and tools for working artists.</h1>
-      <p>
-        A static catalog for products, collections, and future trade-friendly
-        product information.
-      </p>
-      <a class="button" href="/products/">View Products</a>
-    </div>
-    <img src="/assets/collections/paint.jpg" alt="" />
-  </section>
-
-  <section class="section">
-    <div class="section-heading">
-      <h2>Collections</h2>
-      <a href="/collections/">View all</a>
-    </div>
-    <div class="collection-grid">
-      {collections.map((collection) => <CollectionCard collection={collection} />)}
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="section-heading">
-      <h2>Featured Products</h2>
-      <a href="/products/">View all</a>
-    </div>
-    <div class="product-grid">
-      {featuredProducts.map((product) => <ProductCard product={product} />)}
-    </div>
-  </section>
-</BaseLayout>
-```
-
-The homepage is hard-coded for now. That is deliberate. Get the catalog working first. Turn the homepage into CMS-managed blocks later if you need that editing power.
-
-Checkpoint:
-
-With the dev server running, open:
+Route:
 
 ```text
-http://localhost:4321/
+/dala-catalog/
 ```
 
-You should now see a Dala Catalog homepage with a hero, collection cards, and featured product cards.
-
----
-
-## 9. Create The Product Listing Page
-
-Create:
+Product listing:
 
 ```text
 src/pages/products/index.astro
 ```
 
-Add:
-
-```astro
----
-import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import ProductCard from "../../components/ProductCard.astro";
-
-const products = await getCollection("products");
----
-
-<BaseLayout title="Products" description="Browse Dala catalog products.">
-  <section class="section">
-    <h1>Products</h1>
-    <div class="product-grid">
-      {products.map((product) => <ProductCard product={product} />)}
-    </div>
-  </section>
-</BaseLayout>
-```
-
-Checkpoint:
-
-Open:
+Route:
 
 ```text
-http://localhost:4321/products/
+/dala-catalog/products/
 ```
 
-You should see both example products listed.
-
----
-
-## 10. Create Individual Product Pages
-
-Create:
+Product detail:
 
 ```text
 src/pages/products/[slug].astro
 ```
 
-Add:
-
-```astro
----
-import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-
-export async function getStaticPaths() {
-  const products = await getCollection("products");
-
-  return products.map((product) => ({
-    params: { slug: product.id },
-    props: { product },
-  }));
-}
-
-const { product } = Astro.props;
----
-
-<BaseLayout title={product.data.title} description={product.data.summary}>
-  <section class="product-detail">
-    <img src={product.data.image} alt={product.data.title} />
-
-    <div>
-      <a class="back-link" href="/products/">Back to products</a>
-      <p class="eyebrow">{product.data.brand}</p>
-      <h1>{product.data.title}</h1>
-      <p class="lead">{product.data.summary}</p>
-      {product.data.description && <p>{product.data.description}</p>}
-
-      {product.data.packSizes.length > 0 && (
-        <div class="detail-block">
-          <h2>Pack Sizes</h2>
-          <ul>
-            {product.data.packSizes.map((size) => <li>{size}</li>)}
-          </ul>
-        </div>
-      )}
-
-      {product.data.tags.length > 0 && (
-        <div class="detail-block">
-          <h2>Tags</h2>
-          <ul>
-            {product.data.tags.map((tag) => <li>{tag}</li>)}
-          </ul>
-        </div>
-      )}
-    </div>
-  </section>
-</BaseLayout>
-```
-
-Astro will generate one static page for every Markdown file in `src/content/products`.
-
-Checkpoint:
-
-Open:
+Example route:
 
 ```text
-http://localhost:4321/products/acrylic-paint/
+/dala-catalog/products/acrylic-paint/
 ```
 
-You should see the Acrylic Paint product detail page.
-
----
-
-## 11. Create The Collection Listing Page
-
-Create:
+Collection listing:
 
 ```text
 src/pages/collections/index.astro
 ```
 
-Add:
-
-```astro
----
-import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import CollectionCard from "../../components/CollectionCard.astro";
-
-const collections = await getCollection("collections");
----
-
-<BaseLayout title="Collections" description="Browse Dala product collections.">
-  <section class="section">
-    <h1>Collections</h1>
-    <div class="collection-grid">
-      {collections.map((collection) => <CollectionCard collection={collection} />)}
-    </div>
-  </section>
-</BaseLayout>
-```
-
-Checkpoint:
-
-Open:
+Route:
 
 ```text
-http://localhost:4321/collections/
+/dala-catalog/collections/
 ```
 
-You should see the Paint and Clay And Modelling collections.
-
----
-
-## 12. Create Individual Collection Pages
-
-Create:
+Collection detail:
 
 ```text
 src/pages/collections/[slug].astro
 ```
 
-Add:
-
-```astro
----
-import { getCollection } from "astro:content";
-import BaseLayout from "../../layouts/BaseLayout.astro";
-import ProductCard from "../../components/ProductCard.astro";
-
-export async function getStaticPaths() {
-  const collections = await getCollection("collections");
-  const products = await getCollection("products");
-
-  return collections.map((collection) => {
-    const collectionProducts = collection.data.products
-      .map((id) => products.find((product) => product.id === id))
-      .filter(Boolean);
-
-    return {
-      params: { slug: collection.id },
-      props: { collection, products: collectionProducts },
-    };
-  });
-}
-
-const { collection, products } = Astro.props;
----
-
-<BaseLayout title={collection.data.title} description={collection.data.summary}>
-  <section class="collection-hero">
-    {collection.data.image && <img src={collection.data.image} alt="" />}
-    <div>
-      <p class="eyebrow">Collection</p>
-      <h1>{collection.data.title}</h1>
-      <p>{collection.data.summary}</p>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="product-grid">
-      {products.map((product) => <ProductCard product={product} />)}
-    </div>
-  </section>
-</BaseLayout>
-```
-
-This page uses the manually ordered product ID list from the collection file. That gives you merchandising control: the order in the Markdown file is the order on the page.
-
-Checkpoint:
-
-Open:
+Example route:
 
 ```text
-http://localhost:4321/collections/paint/
+/dala-catalog/collections/paint/
 ```
 
-You should see the Paint collection page with Acrylic Paint listed inside it.
+Diagnostic checkpoint:
+
+```text
+src/pages/catalog-checkpoint.astro
+```
+
+Route:
+
+```text
+/dala-catalog/catalog-checkpoint/
+```
+
+The checkpoint page reads the products and collections directly from content collections and prints their titles. It is useful for confirming the content layer works. It can be kept or removed later.
 
 ---
 
-## 13. Add Basic Styles
+## 11. Styles
 
-Create:
+Styles live in:
 
 ```text
 public/styles.css
 ```
 
-Add:
+Because `public/` files are served from the site root at build time, the layout loads this file using the base-aware helper:
 
-```css
-:root {
-  --ink: #111111;
-  --muted: #5f5f5f;
-  --paper: #f7f4ef;
-  --panel: #ffffff;
-  --line: #ded8cd;
-  --accent: #d71920;
-  color: var(--ink);
-  background: var(--paper);
-  font-family: Arial, Helvetica, sans-serif;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-body {
-  margin: 0;
-}
-
-a {
-  color: inherit;
-}
-
-img {
-  display: block;
-  max-width: 100%;
-}
-
-.site-header {
-  align-items: center;
-  background: #ffffff;
-  border-bottom: 1px solid var(--line);
-  display: flex;
-  gap: 24px;
-  justify-content: space-between;
-  padding: 18px clamp(20px, 5vw, 72px);
-}
-
-.site-logo {
-  font-weight: 900;
-  text-decoration: none;
-  text-transform: uppercase;
-}
-
-.site-header nav {
-  display: flex;
-  gap: 18px;
-}
-
-.site-header nav a {
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.hero,
-.section,
-.product-detail,
-.collection-hero {
-  padding: clamp(40px, 7vw, 92px) clamp(20px, 5vw, 72px);
-}
-
-.hero,
-.product-detail,
-.collection-hero {
-  align-items: center;
-  display: grid;
-  gap: clamp(28px, 6vw, 80px);
-  grid-template-columns: minmax(0, 1fr) minmax(280px, 1fr);
-}
-
-.hero {
-  min-height: 70vh;
-}
-
-.hero h1,
-.section h1,
-.product-detail h1,
-.collection-hero h1 {
-  font-size: clamp(42px, 7vw, 86px);
-  letter-spacing: 0;
-  line-height: 0.95;
-  margin: 0 0 22px;
-  text-transform: uppercase;
-}
-
-.section h2,
-.product-card h2,
-.collection-card h2 {
-  margin: 0;
-}
-
-p {
-  color: var(--muted);
-  line-height: 1.55;
-}
-
-.eyebrow {
-  color: var(--accent);
-  font-size: 13px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.lead {
-  color: var(--ink);
-  font-size: 20px;
-}
-
-.button {
-  background: var(--accent);
-  color: #ffffff;
-  display: inline-flex;
-  font-weight: 800;
-  min-height: 44px;
-  align-items: center;
-  padding: 0 18px;
-  text-decoration: none;
-}
-
-.hero img,
-.collection-hero img,
-.product-detail > img {
-  aspect-ratio: 1 / 1;
-  background: #ede8df;
-  object-fit: cover;
-  width: 100%;
-}
-
-.section-heading {
-  align-items: end;
-  display: flex;
-  gap: 20px;
-  justify-content: space-between;
-  margin-bottom: 24px;
-}
-
-.product-grid,
-.collection-grid {
-  display: grid;
-  gap: 20px;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-}
-
-.product-card,
-.collection-card {
-  background: var(--panel);
-  border: 1px solid var(--line);
-}
-
-.product-card a,
-.collection-card a {
-  display: grid;
-  gap: 12px;
-  padding: 14px;
-  text-decoration: none;
-}
-
-.product-card img,
-.collection-card img {
-  aspect-ratio: 1 / 1;
-  background: #ede8df;
-  object-fit: cover;
-  width: 100%;
-}
-
-.product-card span {
-  color: var(--accent);
-  font-size: 12px;
-  font-weight: 900;
-  text-transform: uppercase;
-}
-
-.detail-block {
-  border-top: 1px solid var(--line);
-  margin-top: 24px;
-  padding-top: 18px;
-}
-
-.back-link {
-  color: var(--muted);
-  display: inline-block;
-  font-weight: 800;
-  margin-bottom: 18px;
-  text-decoration: none;
-}
-
-@media (max-width: 760px) {
-  .site-header {
-    align-items: flex-start;
-    flex-direction: column;
-  }
-
-  .hero,
-  .product-detail,
-  .collection-hero {
-    grid-template-columns: 1fr;
-  }
-}
+```astro
+<link rel="stylesheet" href={path("styles.css")} />
 ```
 
-This styling is intentionally modest. It gives you a clean catalog, not a final brand system. Once the content structure is correct, you can push the visual direction much further.
-
----
-
-## 14. Build The Static Site
-
-Run:
-
-```bash
-npm run build
-```
-
-Astro outputs the static site to:
+On GitHub Pages, this becomes:
 
 ```text
-dist/
-```
-
-That `dist` folder is what gets deployed to a static host.
-
-To preview the built site locally:
-
-```bash
-npm run preview
+/dala-catalog/styles.css
 ```
 
 ---
 
-## 15. Recommended Final Shape
+## 12. Add A New Product
 
-The project should now feel like this:
+1. Add an image:
 
 ```text
-dala-catalog-astro/
-  public/
-    assets/
-      products/
-      collections/
-    styles.css
-  src/
-    content.config.ts
-    components/
-      CollectionCard.astro
-      ProductCard.astro
-    content/
-      products/
-        acrylic-paint.md
-        air-drying-clay.md
-      collections/
-        paint.md
-        clay-and-modelling.md
-    layouts/
-      BaseLayout.astro
-    pages/
-      index.astro
-      products/
-        index.astro
-        [slug].astro
-      collections/
-        index.astro
-        [slug].astro
-  package.json
+public/assets/products/fabric-paint.jpg
 ```
 
----
-
-## 16. How To Add More Products
-
-To add a product:
-
-1. Add an image to `public/assets/products/`.
-2. Add a Markdown file to `src/content/products/`.
-3. Add that product ID to one or more collection files.
-
-Example:
+2. Add a product file:
 
 ```text
 src/content/products/fabric-paint.md
@@ -1047,6 +594,7 @@ src/content/products/fabric-paint.md
 title: Fabric Paint
 brand: Dala
 summary: Colour for textile craft, apparel decoration, and mixed-media surfaces.
+description: Fabric Paint supports textile craft, apparel decoration, and mixed-media surfaces.
 image: /assets/products/fabric-paint.jpg
 packSizes:
   - 50 ml
@@ -1057,7 +605,7 @@ tags:
 ---
 ```
 
-Then add the ID to a collection:
+3. Add the product ID to a collection:
 
 ```md
 products:
@@ -1065,180 +613,94 @@ products:
   - fabric-paint
 ```
 
----
-
-## 17. Future-Friendly Choices
-
-This basic build leaves clear places for later features.
-
-CMS:
-
-- A CMS can write to `src/content/products` and `src/content/collections`.
-- The schema already validates required product fields.
-- Collection product references already use product IDs, which map nicely to CMS relation fields.
-
-Smart search:
-
-- Product title, brand, summary, description, tags, and pack sizes are already structured.
-- A future search index can be generated from `getCollection("products")`.
-- You can add `sku` and `barcode` fields later without changing the page structure.
-
-Brands:
-
-- Products already have a `brand` field.
-- Later, `brand` can become a full content collection if you need brand pages, logos, brand colours, or Teddy-specific landing pages.
-
-Filtering:
-
-- Tags are already arrays.
-- Later, filters can use tags, brands, pack sizes, or collections.
-
-Landing pages:
-
-- The homepage is simple now.
-- Later, you can add a `pages` content collection with reusable blocks like hero, text band, collection preview, and featured products.
-
-The important rule is: products and collections stay as the core data model. CMS, search, filters, and landing pages should sit on top of that model, not replace it.
+The product ID is the filename without `.md`.
 
 ---
 
-## 18. Deploy To GitHub Pages
+## 13. Add A New Collection
 
-Astro can deploy a static site to GitHub Pages with GitHub Actions.
-
-The official Astro docs recommend using Astro's GitHub Action, which builds the site and deploys the generated static output to GitHub Pages.
-
-Official docs:
-
-- Astro GitHub Pages guide: https://docs.astro.build/en/guides/deploy/github/
-- GitHub Pages: https://pages.github.com/
-
-### Choose The GitHub Pages URL
-
-For your GitHub username, `Outige`, there are two common options.
-
-Option A: project site
+1. Add an image:
 
 ```text
-https://outige.github.io/dala-catalog-astro/
+public/assets/collections/craft-and-fabric.jpg
 ```
 
-Use this if the GitHub repository is named:
+2. Add a collection file:
 
 ```text
-dala-catalog-astro
+src/content/collections/craft-and-fabric.md
 ```
 
-Option B: user site
-
-```text
-https://outige.github.io/
-```
-
-Use this only if the GitHub repository is named:
-
-```text
-Outige.github.io
-```
-
-Most projects use option A.
-
-### Configure Astro
-
-For a project site, update:
-
-```text
-astro.config.mjs
-```
-
-to:
-
-```js
-// @ts-check
-import { defineConfig } from "astro/config";
-
-export default defineConfig({
-  site: "https://outige.github.io",
-  base: "/dala-catalog-astro",
-});
-```
-
-If your repository has a different name, change `base` to match the repository name:
-
-```js
-base: "/your-repo-name",
-```
-
-If you are using the special `Outige.github.io` repository, do not set `base`:
-
-```js
-// @ts-check
-import { defineConfig } from "astro/config";
-
-export default defineConfig({
-  site: "https://outige.github.io",
-});
-```
-
-### Important Base Path Note
-
-When `base` is set, GitHub Pages serves the site from a subfolder like:
-
-```text
-/dala-catalog-astro/
-```
-
-That means absolute links like these can break after deployment:
-
-```astro
-<a href="/products/">Products</a>
-<img src="/assets/products/acrylic-paint.jpg" alt="Acrylic Paint" />
-<link rel="stylesheet" href="/styles.css" />
-```
-
-For a GitHub Pages project site, prefix internal links and public assets with Astro's base URL.
-
-Example:
-
-```astro
+```md
 ---
-const base = import.meta.env.BASE_URL;
+title: Craft And Fabric
+summary: Creative finishes for textiles, mixed media, and decorative craft.
+image: /assets/collections/craft-and-fabric.jpg
+products:
+  - fabric-paint
+---
+```
+
+The new collection page will be generated automatically at:
+
+```text
+/dala-catalog/collections/craft-and-fabric/
+```
+
 ---
 
-<a href={`${base}products/`}>Products</a>
-<img src={`${base}assets/products/acrylic-paint.jpg`} alt="Acrylic Paint" />
-<link rel="stylesheet" href={`${base}styles.css`} />
+## 14. Build And Preview
+
+From the Astro app folder:
+
+```bash
+cd dala-catalog-astro
 ```
 
-For content image paths stored as `/assets/...`, create a tiny helper when you are ready to deploy:
+Development server:
 
-```astro
----
-const base = import.meta.env.BASE_URL;
-const assetPath = (path) => `${base}${path.replace(/^\//, "")}`;
----
-
-<img src={assetPath(product.data.image)} alt={product.data.title} />
+```bash
+npm run dev
 ```
 
-This keeps local development working while making GitHub Pages project URLs work too.
+Build static files:
 
-### Add The GitHub Actions Workflow
+```bash
+npm run build
+```
 
-Create:
+Preview the built site:
+
+```bash
+npm run preview
+```
+
+The build output goes to:
+
+```text
+dala-catalog-astro/dist/
+```
+
+The GitHub Action builds this same output and deploys it to GitHub Pages.
+
+---
+
+## 15. GitHub Pages Deployment
+
+The deployment workflow is:
 
 ```text
 .github/workflows/deploy.yml
 ```
 
-Add:
+Current content:
 
 ```yml
 name: Deploy to GitHub Pages
 
 on:
   push:
-    branches: [main]
+    branches: [master]
   workflow_dispatch:
 
 permissions:
@@ -1255,6 +717,9 @@ jobs:
 
       - name: Install, build, and upload your site
         uses: withastro/action@v6
+        with:
+          path: ./dala-catalog-astro
+          node-version: 22
 
   deploy:
     needs: build
@@ -1268,41 +733,129 @@ jobs:
         uses: actions/deploy-pages@v5
 ```
 
-If your Astro project is inside a subfolder of the repository, configure the Astro action with `path`.
+Important details:
 
-For example, if the repository root contains `dala-catalog-astro/`:
+- The workflow runs on pushes to `master`.
+- The Astro app is in `./dala-catalog-astro`, so the workflow sets `path: ./dala-catalog-astro`.
+- GitHub Actions uses Node 22.
+- The Astro config uses `base: "/dala-catalog"`.
 
-```yml
-      - name: Install, build, and upload your site
-        uses: withastro/action@v6
-        with:
-          path: ./dala-catalog-astro
-```
+On GitHub, the extra UI step is:
 
-### Configure GitHub Pages
-
-On GitHub:
-
-1. Open the repository.
+1. Open the repository on GitHub.
 2. Go to `Settings`.
 3. Go to `Pages`.
 4. Under `Build and deployment`, set `Source` to `GitHub Actions`.
-5. Commit and push the workflow file.
 
-After the action finishes, the site should be live at:
+After that, pushing to `master` should trigger the deploy.
 
-```text
-https://outige.github.io/dala-catalog-astro/
-```
-
-### GitHub Pages Checkpoint
-
-After deployment, check:
+Expected deployed URL:
 
 ```text
-https://outige.github.io/dala-catalog-astro/
-https://outige.github.io/dala-catalog-astro/products/
-https://outige.github.io/dala-catalog-astro/collections/
+https://outige.github.io/dala-catalog/
 ```
 
-If the HTML loads but styles or images are missing, the problem is almost always the `base` path or absolute `/assets/...` paths.
+Useful deployed routes:
+
+```text
+https://outige.github.io/dala-catalog/
+https://outige.github.io/dala-catalog/products/
+https://outige.github.io/dala-catalog/products/acrylic-paint/
+https://outige.github.io/dala-catalog/collections/
+https://outige.github.io/dala-catalog/collections/paint/
+```
+
+Official Astro guide:
+
+```text
+https://docs.astro.build/en/guides/deploy/github/
+```
+
+---
+
+## 16. Push To GitHub
+
+From the repository root:
+
+```bash
+git status
+git add .github dala-catalog-astro ASTRO_BASIC_CATALOG_TUTORIAL.md
+git commit -m "Set up Astro catalog and GitHub Pages deploy"
+git push origin master
+```
+
+After pushing:
+
+1. Open the GitHub repository.
+2. Go to `Actions`.
+3. Open the latest `Deploy to GitHub Pages` run.
+4. Wait for it to complete.
+5. Open the Pages URL.
+
+---
+
+## 17. Troubleshooting
+
+If GitHub Pages shows unstyled HTML:
+
+- Check that `astro.config.mjs` has `base: "/dala-catalog"`.
+- Check that the layout loads CSS through `path("styles.css")`.
+
+If images are broken:
+
+- Check that image files exist in `public/assets/...`.
+- Check that image paths in Markdown start with `/assets/...`.
+- Check that components render images through `path(product.data.image)` or `path(collection.data.image)`.
+
+If GitHub Actions does not run:
+
+- Check that the workflow is at `.github/workflows/deploy.yml`.
+- Check that the workflow branch matches the branch you push to. This project currently uses `master`.
+- Check GitHub repository `Settings -> Pages -> Build and deployment -> Source`.
+
+If Astro says Node is unsupported:
+
+- Use Node `>=22.12.0`.
+- GitHub Actions is already configured with `node-version: 22`.
+
+If a collection page shows no products:
+
+- Check the product ID in the collection file.
+- The ID must match the product filename without `.md`.
+
+Example:
+
+```text
+src/content/products/acrylic-paint.md
+```
+
+must be referenced as:
+
+```md
+products:
+  - acrylic-paint
+```
+
+---
+
+## 18. Future Features
+
+CMS:
+
+- A CMS can write Markdown files into `src/content/products` and `src/content/collections`.
+- Collection product references already use IDs that can map to CMS relation fields.
+
+Search:
+
+- A future search index can be generated from `getCollection("products")`.
+- Product fields are already structured enough for title, summary, description, brand, tags, and pack-size search.
+
+Brands:
+
+- Products already have a `brand` field.
+- Later, brands can become their own content collection if Dala and Teddy need separate landing pages.
+
+Filtering:
+
+- Tags are already arrays.
+- Later, filters can use tags, brands, pack sizes, or collections.

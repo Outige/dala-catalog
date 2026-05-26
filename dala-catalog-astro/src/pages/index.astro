@@ -3,10 +3,53 @@ import { getCollection } from "astro:content";
 import BaseLayout from "../layouts/BaseLayout.astro";
 import ProductCard from "../components/ProductCard.astro";
 import CollectionCard from "../components/CollectionCard.astro";
+import HighlightReel from "../components/HighlightReel.astro";
 
 const products = await getCollection("products");
 const collections = await getCollection("collections");
 const featuredProducts = products.slice(0, 4);
+const highlightItems = [
+  {
+    image: "assets/collections/paint.jpg",
+    alt: "Assorted Dala paint colours",
+    heading: "Colour, texture, and tools for working artists.",
+    text: "A static catalog for products, collections, and future trade-friendly product information.",
+    ctaLabel: "View Products",
+    ctaHref: "products/",
+    layout: "overlay",
+    mobile: {
+      heading: "Artist materials, ready to browse.",
+      text: "Explore products and collections from your phone.",
+      layout: "overlay",
+    },
+  },
+  {
+    image: "assets/collections/pink-paint.gif",
+    alt: "Pink paint being mixed",
+    heading: "Paint that brings new work into focus.",
+    text: "Browse the paint collection and find materials for studio, classroom, and retail shelves.",
+    ctaLabel: "Explore Paint",
+    ctaHref: "collections/paint/",
+    layout: "overlay",
+    mobile: {
+      heading: "Paint for every surface.",
+      layout: "overlay",
+    },
+  },
+  {
+    image: "assets/collections/clay-and-modelling.jpg",
+    alt: "Clay and modelling materials",
+    heading: "Shape, model, and build with tactile materials.",
+    text: "Discover clay and modelling supplies for hands-on creative projects.",
+    ctaLabel: "View Collection",
+    ctaHref: "collections/clay-and-modelling/",
+    layout: "overlay",
+    mobile: {
+      text: "Hands-on materials for creative projects.",
+      layout: "overlay",
+    },
+  },
+];
 
 const base = import.meta.env.BASE_URL.endsWith("/")
   ? import.meta.env.BASE_URL
@@ -18,18 +61,11 @@ const path = (value) => `${base}${value.replace(/^\//, "")}`;
   title="Dala Catalog"
   description="Dala artist materials catalog."
 >
-  <section class="hero">
-    <div>
-      <p class="eyebrow">Dala Artist Materials</p>
-      <h1>Colour, texture, and tools for working artists.</h1>
-      <p>
-        A static catalog for products, collections, and future trade-friendly
-        product information.
-      </p>
-      <a class="button" href={path("products/")}>View Products</a>
-    </div>
-    <img src={path("assets/collections/paint.jpg")} alt="" />
-  </section>
+  <HighlightReel
+    eyebrow="Dala Artist Materials"
+    items={highlightItems}
+    intervalMs={6500}
+  />
 
   <section class="section">
     <div class="section-heading">

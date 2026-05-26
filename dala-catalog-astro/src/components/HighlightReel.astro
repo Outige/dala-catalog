@@ -1,0 +1,455 @@
+---
+type HighlightReelLayout = "text-right" | "text-left" | "overlay";
+
+type HighlightReelContent = {
+  image: string;
+  alt?: string;
+  heading?: string;
+  text?: string;
+  ctaLabel?: string;
+  ctaHref?: string;
+  layout?: HighlightReelLayout;
+};
+
+type HighlightReelItem = HighlightReelContent & {
+  mobile?: Partial<HighlightReelContent>;
+};
+
+type Props = {
+  items: HighlightReelItem[];
+  eyebrow?: string;
+  intervalMs?: number;
+};
+
+const { items = [], eyebrow = "Featured", intervalMs = 6500 } = Astro.props;
+const normalizedItems = items.map((item) => ({
+  desktop: item,
+  mobile: { ...item, ...item.mobile },
+  layout: item.layout ?? "text-right",
+  mobileLayout: item.mobile?.layout ?? item.layout ?? "text-right",
+}));
+const firstLayout = normalizedItems[0]?.layout ?? "text-right";
+const firstMobileLayout = normalizedItems[0]?.mobileLayout ?? firstLayout;
+
+const base = import.meta.env.BASE_URL.endsWith("/")
+  ? import.meta.env.BASE_URL
+  : `${import.meta.env.BASE_URL}/`;
+const toUrl = (value: string) =>
+  /^(https?:)?\/\//.test(value) || /^[a-z]+:/i.test(value) || value.startsWith("#")
+    ? value
+    : `${base}${value.replace(/^\//, "")}`;
+---
+
+{
+  items.length > 0 && (
+    <section
+      class:list={["highlight-reel", `highlight-reel--${firstLayout}`]}
+      data-highlight-reel
+      data-layout={firstLayout}
+      data-mobile-layout={firstMobileLayout}
+      data-interval={intervalMs}
+      style={`--highlight-duration: ${intervalMs}ms;`}
+      aria-roledescription="carousel"
+      aria-label={eyebrow}
+    >
+      <div class="highlight-reel__media">
+        {normalizedItems.map(({ desktop, mobile, layout, mobileLayout }, index) => (
+          <picture
+            class:list={[
+              "highlight-reel__image",
+              index === 0 && "is-active",
+            ]}
+            data-highlight-layout={layout}
+            data-highlight-mobile-layout={mobileLayout}
+            data-highlight-slide
+            aria-hidden={index === 0 ? "false" : "true"}
+          >
+            {mobile.image !== desktop.image && (
+              <source media="(max-width: 760px)" srcset={toUrl(mobile.image)} />
+            )}
+            <img src={toUrl(desktop.image)} alt={mobile.alt ?? desktop.alt ?? ""} />
+          </picture>
+        ))}
+      </div>
+
+      <div class="highlight-reel__content">
+        <p class="eyebrow">{eyebrow}</p>
+        <div class="highlight-reel__copy">
+          {normalizedItems.map(({ desktop, mobile }, index) => (
+            <div
+              class:list={[
+                "highlight-reel__panel",
+                index === 0 && "is-active",
+              ]}
+              data-highlight-panel
+              aria-hidden={index === 0 ? "false" : "true"}
+            >
+              <div class="highlight-reel__panel-content highlight-reel__panel-content--desktop">
+                {desktop.heading && <h2>{desktop.heading}</h2>}
+                {desktop.text && <p>{desktop.text}</p>}
+                {desktop.ctaHref && desktop.ctaLabel && (
+                  <a class="button" href={toUrl(desktop.ctaHref)}>
+                    {desktop.ctaLabel}
+                  </a>
+                )}
+              </div>
+              <div class="highlight-reel__panel-content highlight-reel__panel-content--mobile">
+                {mobile.heading && <h2>{mobile.heading}</h2>}
+                {mobile.text && <p>{mobile.text}</p>}
+                {mobile.ctaHref && mobile.ctaLabel && (
+                  <a class="button" href={toUrl(mobile.ctaHref)}>
+                    {mobile.ctaLabel}
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {items.length > 1 && (
+          <div class="highlight-reel__timer" aria-label="Highlight progress">
+            {normalizedItems.map(({ desktop, mobile }, index) => (
+              <button
+                class:list={[
+                  "highlight-reel__indicator",
+                  index === 0 && "is-active",
+                ]}
+                type="button"
+                data-highlight-indicator
+                aria-label={`Show ${mobile.heading ?? desktop.heading ?? `highlight ${index + 1}`}`}
+                aria-current={index === 0 ? "true" : "false"}
+              >
+                <span></span>
+              </button>
+            ))}
+          </div>
+        )}
+      </div>
+    </section>
+  )
+}
+
+<script>
+  const reels = document.querySelectorAll("[data-highlight-reel]");
+
+  reels.forEach((reel) => {
+    const slides = Array.from(reel.querySelectorAll("[data-highlight-slide]"));
+    const panels = Array.from(reel.querySelectorAll("[data-highlight-panel]"));
+    const indicators = Array.from(
+      reel.querySelectorAll("[data-highlight-indicator]")
+    );
+    const interval = Number(reel.getAttribute("data-interval")) || 6500;
+    const layoutClasses = [
+      "highlight-reel--text-right",
+      "highlight-reel--text-left",
+      "highlight-reel--overlay",
+    ];
+    const mobileQuery = window.matchMedia("(max-width: 760px)");
+    let activeIndex = 0;
+    let timer;
+
+    if (slides.length < 2) {
+      return;
+    }
+
+    const syncLayout = () => {
+      const activeLayout =
+        (mobileQuery.matches
+          ? slides[activeIndex].getAttribute("data-highlight-mobile-layout")
+          : slides[activeIndex].getAttribute("data-highlight-layout")) ||
+        "text-right";
+
+      reel.classList.remove(...layoutClasses);
+      reel.classList.add(`highlight-reel--${activeLayout}`);
+      reel.setAttribute("data-layout", activeLayout);
+    };
+
+    const setActive = (nextIndex) => {
+      activeIndex = nextIndex;
+      syncLayout();
+
+      slides.forEach((slide, index) => {
+        const isActive = index === activeIndex;
+        slide.classList.toggle("is-active", isActive);
+        slide.setAttribute("aria-hidden", String(!isActive));
+      });
+
+      panels.forEach((panel, index) => {
+        const isActive = index === activeIndex;
+        panel.classList.toggle("is-active", isActive);
+        panel.setAttribute("aria-hidden", String(!isActive));
+      });
+
+      indicators.forEach((indicator, index) => {
+        const isActive = index === activeIndex;
+        indicator.classList.toggle("is-active", isActive);
+        indicator.setAttribute("aria-current", String(isActive));
+      });
+    };
+
+    const queueNext = () => {
+      window.clearTimeout(timer);
+      timer = window.setTimeout(() => {
+        setActive((activeIndex + 1) % slides.length);
+        queueNext();
+      }, interval);
+    };
+
+    indicators.forEach((indicator, index) => {
+      indicator.addEventListener("click", () => {
+        setActive(index);
+        queueNext();
+      });
+    });
+
+    mobileQuery.addEventListener("change", syncLayout);
+    syncLayout();
+    queueNext();
+  });
+</script>
+
+<style>
+  .highlight-reel {
+    align-items: stretch;
+    display: grid;
+    gap: clamp(28px, 6vw, 80px);
+    grid-template-columns: minmax(0, 1.05fr) minmax(280px, 0.95fr);
+    min-height: 30vh;
+    padding: clamp(40px, 7vw, 92px) clamp(20px, 5vw, 72px);
+  }
+
+  .highlight-reel--text-left .highlight-reel__media {
+    grid-column: 2;
+  }
+
+  .highlight-reel--text-left .highlight-reel__content {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .highlight-reel--overlay {
+    color: #ffffff;
+    grid-template-columns: 1fr;
+    min-height: 58vh;
+    padding: 0;
+    position: relative;
+  }
+
+  .highlight-reel--overlay .highlight-reel__media {
+    grid-column: 1;
+    grid-row: 1;
+    min-height: 58vh;
+  }
+
+  .highlight-reel--overlay .highlight-reel__media::after {
+    background: linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.68),
+      rgba(0, 0, 0, 0.42) 48%,
+      rgba(0, 0, 0, 0.06)
+    );
+    content: "";
+    inset: 0;
+    position: absolute;
+    z-index: 1;
+  }
+
+  .highlight-reel--overlay .highlight-reel__content {
+    align-self: end;
+    grid-column: 1;
+    grid-row: 1;
+    max-width: 780px;
+    padding: clamp(40px, 7vw, 92px) clamp(20px, 5vw, 72px);
+    position: relative;
+    z-index: 2;
+  }
+
+  .highlight-reel--overlay p,
+  .highlight-reel--overlay .eyebrow {
+    color: #ffffff;
+  }
+
+  .highlight-reel--overlay .highlight-reel__panel p {
+    color: rgba(255, 255, 255, 0.86);
+  }
+
+  .highlight-reel--overlay .highlight-reel__indicator span {
+    background: rgba(255, 255, 255, 0.3);
+  }
+
+  .highlight-reel--overlay .highlight-reel__indicator span::after {
+    background: #ffffff;
+  }
+
+  .highlight-reel__media {
+    background: #ede8df;
+    min-height: 30vh;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .highlight-reel__image {
+    height: 100%;
+    inset: 0;
+    object-fit: cover;
+    opacity: 0;
+    position: absolute;
+    transition: opacity 420ms ease;
+    width: 100%;
+  }
+
+  .highlight-reel__image img {
+    height: 100%;
+    object-fit: cover;
+    width: 100%;
+  }
+
+  .highlight-reel__image.is-active {
+    opacity: 1;
+  }
+
+  .highlight-reel__content {
+    align-self: center;
+  }
+
+  .highlight-reel__copy {
+    display: grid;
+  }
+
+  .highlight-reel__panel {
+    grid-area: 1 / 1;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition:
+      opacity 260ms ease,
+      transform 260ms ease;
+  }
+
+  .highlight-reel__panel.is-active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  .highlight-reel h2 {
+    font-size: clamp(42px, 7vw, 86px);
+    letter-spacing: 0;
+    line-height: 0.95;
+    margin: 0 0 22px;
+    text-transform: uppercase;
+  }
+
+  .highlight-reel__panel p {
+    max-width: 56ch;
+  }
+
+  .highlight-reel__panel-content--mobile {
+    display: none;
+  }
+
+  .highlight-reel__timer {
+    display: flex;
+    gap: 8px;
+    margin-top: 30px;
+  }
+
+  .highlight-reel__indicator {
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+    height: 18px;
+    padding: 6px 0;
+    width: clamp(42px, 7vw, 86px);
+  }
+
+  .highlight-reel__indicator span {
+    background: #d8d0c4;
+    display: block;
+    height: 6px;
+    overflow: hidden;
+    position: relative;
+    width: 100%;
+  }
+
+  .highlight-reel__indicator span::after {
+    background: var(--accent);
+    content: "";
+    inset: 0;
+    position: absolute;
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .highlight-reel__indicator.is-active span::after {
+    animation: highlight-reel-progress var(--highlight-duration) linear;
+  }
+
+  @keyframes highlight-reel-progress {
+    from {
+      transform: scaleX(0);
+    }
+
+    to {
+      transform: scaleX(1);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .highlight-reel {
+      grid-template-columns: 1fr;
+    }
+
+    .highlight-reel--text-left .highlight-reel__media,
+    .highlight-reel--text-left .highlight-reel__content {
+      grid-column: auto;
+      grid-row: auto;
+    }
+
+    .highlight-reel--overlay {
+      min-height: 72vh;
+    }
+
+    .highlight-reel--overlay .highlight-reel__media {
+      aspect-ratio: auto;
+      min-height: 72vh;
+    }
+
+    .highlight-reel--overlay .highlight-reel__media::after {
+      background: linear-gradient(
+        180deg,
+        rgba(0, 0, 0, 0.12),
+        rgba(0, 0, 0, 0.76)
+      );
+    }
+
+    .highlight-reel--overlay .highlight-reel__content {
+      align-self: end;
+    }
+
+    .highlight-reel__media {
+      aspect-ratio: 4 / 3;
+      min-height: 0;
+    }
+
+    .highlight-reel__panel-content--desktop {
+      display: none;
+    }
+
+    .highlight-reel__panel-content--mobile {
+      display: block;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .highlight-reel__image,
+    .highlight-reel__panel {
+      transition: none;
+    }
+
+    .highlight-reel__indicator.is-active span::after {
+      animation: none;
+      transform: scaleX(1);
+    }
+  }
+</style>
